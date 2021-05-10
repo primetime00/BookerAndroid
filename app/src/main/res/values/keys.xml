@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="booker_preference_url">booker_url</string>
+    <string name="booker_preference_port">booker_port</string>
+    <string name="booker_books">booker_books</string>
+    <string name="booker_current_book">booker_current_book</string>
+</resources>

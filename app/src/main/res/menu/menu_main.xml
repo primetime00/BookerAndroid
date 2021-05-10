@@ -1,0 +1,20 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.kegel.booker.BookerActivity">
+    <group android:id="@+id/action_menu_all">
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:title="@string/action_settings"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_sync"
+        android:orderInCategory="101"
+        android:title="@string/sync_menu_item" />
+        <item
+            android:id="@+id/action_library"
+            android:orderInCategory="102"
+            android:title="@string/library" />
+    </group>
+</menu>
