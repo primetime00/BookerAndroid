@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -253,5 +254,17 @@ public class Helpers {
         BookInfo b = new BookInfo.Builder(book).setPosition(currentPosition/1000).build();
         recordBook(context, b);
         return b;
+    }
+
+    public static boolean exists(Context context, BookInfo cBook) {
+        for (int i=0; i<cBook.getChapterFiles().size(); ++i) {
+            String fname = Helpers.getName(cBook, i);
+            File f = new File(context.getFilesDir(), fname);
+            if (!f.exists()) {
+                Log.d("ryan", String.format("Cannot find file %s", fname));
+                return false;
+            }
+        }
+        return true;
     }
 }

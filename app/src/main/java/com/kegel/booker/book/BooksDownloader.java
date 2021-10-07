@@ -3,6 +3,7 @@ package com.kegel.booker.book;
 import android.content.Context;
 import android.util.Log;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
@@ -53,6 +54,10 @@ public class BooksDownloader {
             String url = Helpers.getURL(context, String.format("book/%s/%d", book.getCrc(), index));
             String filename = Helpers.getName(book, chapterFile);
             InputStreamVolleyRequest request = new InputStreamVolleyRequest(Request.Method.GET, url, context, filename, handler, null);
+            request.setRetryPolicy(new DefaultRetryPolicy(
+                    0,
+                    -1,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
             queue.add(request);
             index++;
         }

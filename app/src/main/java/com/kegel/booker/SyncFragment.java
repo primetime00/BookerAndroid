@@ -125,8 +125,8 @@ public class SyncFragment extends Fragment {
             for (BookInfo dBook : downloadedBooks) {
                 boolean found = false;
                 for (BookInfo cBook : currentBooks) {
-                    if (cBook.getCrc().equals(dBook.getCrc())) { //we have this book
-                        found = true;
+                    if (cBook.getCrc().equals(dBook.getCrc())) { //we have this book, but do we have all of it?
+                        found = Helpers.exists(getContext(), cBook);
                         break;
                     }
                 }

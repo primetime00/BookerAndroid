@@ -60,6 +60,7 @@ public class BookPlayerService extends MediaBrowserServiceCompat implements Medi
     private String currentMediaID = "0";
     private int chapterChangeFlag = 0;
     private BookCheckIn bookCheckIn;
+    private boolean autoAudioLoss = false;
 
 
     private final int seekForwardSeconds = 30;
@@ -129,6 +130,7 @@ public class BookPlayerService extends MediaBrowserServiceCompat implements Medi
                 mediaPlayer.pause();
                 setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED, mediaPlayer.getCurrentPosition());
                 showPausedNotification();
+                bookCheckIn.postCheckIn();
             }
         }
 
@@ -402,40 +404,37 @@ public class BookPlayerService extends MediaBrowserServiceCompat implements Medi
 
     @Override
     public void onAudioFocusChange(int focusChange) {
+        if (mediaPlayer == null)
+            return;
         switch( focusChange ) {
             case AudioManager.AUDIOFOCUS_LOSS: {
+                Log.d("audio", "AUDIO FOCUS LOSS");
                 if( mediaPlayer.isPlaying() ) {
+                    autoAudioLoss = true;
                     setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED, mediaPlayer.getCurrentPosition());
                     mediaPlayer.pause();
                 }
                 break;
             }
-            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT: {
-                int pos = Math.max(mediaPlayer.getCurrentPosition()-2000, 0);
-                mediaPlayer.seekTo(pos);
-                setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED, mediaPlayer.getCurrentPosition());
-                mediaPlayer.pause();
-                break;
-            }
-            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK: {
-                if( mediaPlayer != null ) {
-                    if (mediaPlayer.isPlaying()) {
-                        int pos = Math.max(mediaPlayer.getCurrentPosition()-2000, 0);
-                        mediaPlayer.seekTo(pos);
-                        setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED, mediaPlayer.getCurrentPosition());
-                        mediaPlayer.pause();
-                    }
-                    //mediaPlayer.setVolume(0.3f, 0.3f);
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+            {
+                Log.d("audio", "AUDIO FOCUS LOSS TRANSIENT/DUCK");
+                if (mediaPlayer.isPlaying()) {
+                    autoAudioLoss = true;
+                    int pos = Math.max(mediaPlayer.getCurrentPosition() - 2000, 0);
+                    mediaPlayer.seekTo(pos);
+                    setMediaPlaybackState(PlaybackStateCompat.STATE_PAUSED, mediaPlayer.getCurrentPosition());
+                    mediaPlayer.pause();
                 }
                 break;
             }
             case AudioManager.AUDIOFOCUS_GAIN: {
-                if( mediaPlayer != null ) {
-                    if( !mediaPlayer.isPlaying() ) {
-                        setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING, mediaPlayer.getCurrentPosition());
-                        mediaPlayer.start();
-                    }
-                    mediaPlayer.setVolume(1.0f, 1.0f);
+                Log.d("audio", "AUDIO FOCUS GAIN");
+                if( !mediaPlayer.isPlaying() && autoAudioLoss) {
+                    autoAudioLoss = false;
+                    setMediaPlaybackState(PlaybackStateCompat.STATE_PLAYING, mediaPlayer.getCurrentPosition());
+                    mediaPlayer.start();
                 }
                 break;
             }

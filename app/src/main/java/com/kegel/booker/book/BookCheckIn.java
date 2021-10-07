@@ -36,29 +36,7 @@ public class BookCheckIn implements OnDownloadDone {
     private final Runnable checkinRunnable = new Runnable() {
         @Override
         public void run() {
-            try {
-                lock.lock();
-                if (book == null || mediaPlayer == null) {
-                    checkinHandler.postDelayed(checkinRunnable, 1000);
-                    return;
-                }
-                int pos = calculatePosition();
-                if (Math.abs(pos - prevCheckinPos) > 60) {
-                    prevCheckinPos = pos;
-                    Log.d("timer", "Saving book progress");
-                    try {
-                        process(book);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    checkinHandler.postDelayed(checkinRunnable, 1000);
-                }
-            }
-            finally {
-                lock.unlock();
-            }
-
+            runCheckIn(true);
         }
     };
     private final Runnable recordRunnable = new Runnable() {
@@ -95,6 +73,55 @@ public class BookCheckIn implements OnDownloadDone {
         this.context = context;
         this.checkinHandler = new Handler();
         this.recordHandler = new Handler();
+    }
+
+    public void checkInOnPause() {
+        try {
+            lock.lock();
+            if (book == null || mediaPlayer == null) {
+                return;
+            }
+            int pos = calculatePosition();
+            prevCheckinPos = pos;
+            Log.d("timer", "Saving book progress");
+            try {
+                process(book);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        finally {
+            lock.unlock();
+        }
+    }
+
+    public void runCheckIn(boolean repeat) {
+        try {
+            lock.lock();
+            if (book == null || mediaPlayer == null) {
+                if (repeat) {
+                    checkinHandler.postDelayed(checkinRunnable, 1000);
+                }
+                return;
+            }
+            int pos = calculatePosition();
+            if (Math.abs(pos - prevCheckinPos) > 60) {
+                prevCheckinPos = pos;
+                Log.d("timer", "Saving book progress");
+                try {
+                    process(book);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                if (repeat) {
+                    checkinHandler.postDelayed(checkinRunnable, 1000);
+                }
+            }
+        }
+        finally {
+            lock.unlock();
+        }
     }
 
     public void process(BookInfo book) throws MalformedURLException, URISyntaxException {
@@ -156,6 +183,10 @@ public class BookCheckIn implements OnDownloadDone {
         }
         pos+=(mediaPlayer.getCurrentPosition()/1000);
         return (int) pos;
+    }
+
+    public void postCheckIn() {
+        checkInOnPause();
     }
 
     @Override
