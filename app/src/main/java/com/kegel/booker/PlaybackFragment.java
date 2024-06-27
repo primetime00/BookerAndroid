@@ -209,7 +209,7 @@ public class PlaybackFragment extends Fragment {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable("playBackState", lastPlaybackState);
-        outState.putParcelable("metaData", lastMetadata);
+        //outState.putParcelable("metaData", lastMetadata);
     }
 
     @Override
@@ -237,7 +237,9 @@ public class PlaybackFragment extends Fragment {
         setFastForwardClick(fastForwardButton);
         setRewindClick(rewindButton);
 
+
         enableMediaButtons(false);
+
 
         if (!mediaBrowser.isConnected()) {
             mediaBrowser.connect();
@@ -379,4 +381,8 @@ public class PlaybackFragment extends Fragment {
     public boolean isBookComplete() {
         return currentBook == null || currentBook.isComplete();
     }
+
+
+
+
 }

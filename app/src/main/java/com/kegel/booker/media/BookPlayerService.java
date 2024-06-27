@@ -146,7 +146,7 @@ public class BookPlayerService extends MediaBrowserServiceCompat implements Medi
             currentBook = BookInfo.create(extras.getString(BookInfo.KEY_JSON));
 
             if (mediaSession.getController().getQueue() == null || reQueue) {
-                mediaSession.setQueue(Helpers.bookToQueue(getApplicationContext(), currentBook));
+                mediaSession.setQueue(Helpers.bookToQueue(BookPlayerService.this, currentBook));
             }
 
             int id = Integer.parseInt(mediaId);
@@ -235,6 +235,8 @@ public class BookPlayerService extends MediaBrowserServiceCompat implements Medi
         registerReceiver(noisyReceiver, filter);
     }
 
+
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -279,7 +281,7 @@ public class BookPlayerService extends MediaBrowserServiceCompat implements Medi
 
     private void initMediaPlayer() {
         mediaPlayer = new MediaPlayer();
-        mediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
+        mediaPlayer.setWakeMode(BookPlayerService.this, PowerManager.PARTIAL_WAKE_LOCK);
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mediaPlayer.setVolume(1.0f, 1.0f);
         mediaPlayer.setOnPreparedListener(this);
@@ -315,8 +317,8 @@ public class BookPlayerService extends MediaBrowserServiceCompat implements Medi
 
 
     private void initMediaSession() {
-        ComponentName mediaButtonReceiver = new ComponentName(getApplicationContext(), MediaButtonReceiver.class);
-        mediaSession = new MediaSessionCompat(getApplicationContext(), "Tag", mediaButtonReceiver, null);
+        ComponentName mediaButtonReceiver = new ComponentName(BookPlayerService.this, MediaButtonReceiver.class);
+        mediaSession = new MediaSessionCompat(BookPlayerService.this, "Tag", mediaButtonReceiver, null);
 
         mediaSession.setFlags(FLAG_HANDLES_QUEUE_COMMANDS);
         mediaSession.setCallback(mediaSessionCallback);

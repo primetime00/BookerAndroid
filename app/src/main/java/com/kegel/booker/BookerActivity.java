@@ -2,10 +2,12 @@ package com.kegel.booker;
 
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -18,6 +20,7 @@ import com.garmin.android.connectiq.ConnectIQ;
 import com.garmin.android.connectiq.IQApp;
 import com.garmin.android.connectiq.IQDevice;
 import com.garmin.android.connectiq.exception.InvalidStateException;
+import com.gu.toolargetool.TooLargeTool;
 import com.kegel.booker.book.Helpers;
 import com.kegel.booker.media.OnBookCompleteListener;
 import com.kegel.booker.ui.UIHelpers;
@@ -37,6 +40,7 @@ public class BookerActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        TooLargeTool.startLogging(getApplication());
         setContentView(R.layout.activity_main);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -58,7 +62,7 @@ public class BookerActivity extends AppCompatActivity {
             }
         });
         PreferenceManager.setDefaultValues(this, R.xml.preferences, true);
-        configTransmitter = new ConfigTransmitter(getApplicationContext());
+        configTransmitter = new ConfigTransmitter(BookerActivity.this);
     }
 
     @Override
